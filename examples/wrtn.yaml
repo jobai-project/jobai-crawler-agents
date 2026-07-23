@@ -1,0 +1,51 @@
+# 자동 생성됨 (분석 에이전트). 회사=wrtn
+# 분류: greeting 공개 API 확인 (board=wrtn)
+# ATS: greeting (board=wrtn)
+company: wrtn
+source_type: embedded_json
+crawler: declarative
+list:
+  url: https://career.wrtn.io/ko/career
+  script_id: __NEXT_DATA__
+  select:
+    array: props.pageProps.dehydratedState.queries
+    match_field: queryKey
+    match_value:
+    - openings
+    take: state.data
+pagination:
+  type: none
+required:
+- job_id
+- title
+fields:
+  job_id: openingId
+  title: title
+  posted_at: openDate
+  deadline: dueDate
+  job_category: openingJobPosition.openingJobPositions[].workspaceOccupation.occupation
+  location: openingJobPosition.openingJobPositions[].workspacePlace.location
+apply_url:
+  template: https://wrtn.career.greetinghr.com/ko/o/{job_id}
+extra:
+  d_day: deadlineDDay
+filter:
+  field: title
+  exclude_contains:
+  - 인재풀
+  - Talent Pool
+  - talent pool
+detail:
+  enabled: true
+  source_type: embedded_json
+  url_template: https://wrtn.career.greetinghr.com/ko/o/{job_id}
+  script_id: __NEXT_DATA__
+  select:
+    array: props.pageProps.dehydratedState.queries
+    match_field: queryKey
+    match_prefix:
+    - career
+    - getOpeningById
+    take: state.data.data
+  fields:
+    description: openingsInfo.detail

@@ -1,0 +1,59 @@
+# === 회사 식별 ===
+company: naver
+company_name_ko: 네이버
+entry_url: https://recruit.navercorp.com/rcrt/list.do
+
+# === 라우팅 (loadJobList.do 가 JSON 반환 → html 아님, json) ===
+crawler: declarative
+source_type: json
+
+# === 목록 수집 (스크롤 더보기 AJAX 엔드포인트) ===
+list:
+  url: https://recruit.navercorp.com/rcrt/loadJobList.do
+  method: GET
+  params:
+    # subJobCdArr = 서버 필터. 앞자리 1=Tech, 2=Design, 3=Service&Business
+    # → Tech 전체 + Design 전체 + PM(3010001, Product Development 추정)
+    subJobCdArr: "1010001,1010002,1010003,1010004,1010005,1010006,1010007,1010008,1010009,1010020,1020001,1030001,1030002,1040001,1040002,1040003,1050001,1050002,1060001,2010001,2020001,2030001,2050001,2060001,2070001,3010001"
+  response_path: list        # { "result":"Y", "list":[ ... ] }
+
+# === 페이지네이션 (offset 방식: firstIndex 를 배치 길이만큼 전진) ===
+pagination:
+  type: offset
+  param: firstIndex
+  start: 0
+
+# 직군 필터는 위 subJobCdArr 로 서버에서 처리 → 클라이언트 filter 불필요
+# (Tech/Design 은 분류상 그대로, PM 은 classCdNm 이 'Service & Business' 로 옴)
+
+# 네이버 목록엔 updated_at 이 없음 → 필수에서 제외
+required: [job_id, title]
+
+# === 상세 본문 (공고마다 view.do 한 번 더 호출) ===
+detail:
+  enabled: true
+  source_type: html
+  url_from: apply_url               # 레코드의 apply_url(=jobDetailLink)을 상세 URL로
+  body_selector: "div.detail_wrap"  # 전체 본문(원본) → description
+  section_box: "div.detail_box"     # 섹션 반복 요소
+  section_title: "h4.detail_title"  # 섹션 제목 (Who We Are / Required Skills ...)
+  section_text: "p.detail_text"     # (참고용; 엔진은 박스 전체 텍스트에서 제목을 떼 sections 생성)
+
+# === 필드 매핑 ===
+fields:
+  job_id: annoId
+  title: annoSubject
+  posted_at: staYmdTime           # "2026.05.14 00:00:00"
+  deadline: endYmdTime            # "2026.06.01 00:00:00" (마감일시)
+  career: entTypeCdNm             # 경력/신입/무관
+  employee_type: empTypeCdNm      # 정규/계약/인턴
+  job_category: classCdNm         # Tech/Design/... (필터 기준)
+  job_sub: subJobCdNm             # AI/ML, Product Design ...
+  status_raw: stateCdNm           # 채용진행중 ...
+  apply_url: jobDetailLink        # 상세 URL을 응답이 직접 줌
+
+# === 사이트 특이 필드 → JSONB ===
+extra:
+  subsidiary: sysCompanyCdNm      # NAVER / ...
+  tmplat: tmplatPath              # naver / labs / webtoon (세부 자회사)
+  state_code: stateCd

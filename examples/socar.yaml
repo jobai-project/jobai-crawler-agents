@@ -1,0 +1,50 @@
+# 수동 작성. 회사=socar
+# 분류: Next.js SSR (__NEXT_DATA__ 임베드, 본사 사이트)
+# Greeting HR 도메인(socar.career.greetinghr.com)은 404 → 본사 사이트에서 추출
+# 코드 참조:
+#   직군(job_group_code): JG01=개발/데이터, JG02=비즈니스, JG03=디자인, JG04=서비스기획
+#   고용형태(employment_type_code): ET01=정규직, ET02=계약직, ET03=인턴, ET04=파견
+#   근무지(work_area_code): WA01=제주, WA02=서울(강남), WA03=서울(성수)
+company: socar
+company_name_ko: 쏘카
+entry_url: https://www.socarcorp.kr/careers/jobs
+crawler: declarative
+source_type: embedded_json
+
+list:
+  url: https://www.socarcorp.kr/careers/jobs
+  method: GET
+  script_id: __NEXT_DATA__
+  response_path: props.pageProps.jobList.jsonResult.data
+
+pagination:
+  type: none
+
+required:
+- job_id
+- title
+
+fields:
+  job_id: recruitment_id
+  title: title
+  apply_url: notice_url
+
+extra:
+  company_name: company_name
+  job_group_code: job_group_code
+  career_code: career_code
+  employment_type_code: employment_type_code
+  work_area_code: work_area_code
+
+detail:
+  enabled: true
+  source_type: embedded_json
+  url_from: apply_url
+  script_id: __NEXT_DATA__
+  select:
+    array: props.pageProps.dehydratedState.queries
+    match_field: queryKey
+    match_prefix: ["career", "getOpeningById"]
+    take: state.data.data
+  fields:
+    description: openingsInfo.detail

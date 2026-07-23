@@ -1,0 +1,41 @@
+# 수동 작성. 회사=lgcns
+# 분류: 자체 JSON API (Adobe AEM, CSRF-Token 헤더 필요하나 값은 무검증)
+# 상세: https://careers.lg.com/apply/detail?id={jobNoticeId}
+company: lgcns
+company_name_ko: LG CNS
+entry_url: https://www.lgcns.com/kr/careers/apply
+crawler: declarative
+source_type: json
+
+list:
+  url: https://www.lgcns.com/bin/careers
+  method: POST
+  params: {}
+  headers:
+    Content-Type: application/json
+    CSRF-Token: "undefined"
+    Referer: https://www.lgcns.com/kr/careers/apply
+  response_path: data.jobNoticeList
+
+pagination:
+  type: none
+
+required:
+- job_id
+- title
+
+fields:
+  job_id: jobNoticeId
+  title: jobNoticeName
+  deadline: recEndDateTime
+  job_category: jobGroupName
+
+extra:
+  career_type: careerTypeName
+  company_code: companyCode
+  company_name: companyName
+  status: noticeStatusName
+  d_day: recDateDiff
+
+apply_url:
+  template: "https://careers.lg.com/apply/detail?id={job_id}"

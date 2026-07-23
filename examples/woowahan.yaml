@@ -1,0 +1,46 @@
+# 우아한형제들(배민) — 자체 구축. 목록 API + JSON 상세(recruitNumber 로 조립).
+# Mode B: 사람이 목록 API URL 제공 → 에이전트가 매핑 → 아래에 상세를 수동 보강.
+company: woowahan
+company_name_ko: 우아한형제들
+source_type: json
+crawler: declarative
+
+list:
+  url: https://career.woowahan.com/w1/recruits
+  method: GET
+  params:
+    category: "all:all"
+    recruitCampaignSeq: 0
+    all: all
+    page: 0
+    size: 100              # 70건 < 100 → 한 번에. (공고 늘면 page_number 페이지네이션으로)
+    sort: "updateDate,desc"
+  response_path: data.list
+
+pagination:
+  type: none
+
+required: [job_id, title]
+
+fields:
+  job_id: recruitSeq
+  title: recruitName
+  recruit_number: recruitNumber      # 상세 URL 조립용
+  posted_at: recruitOpenDate
+  updated_at: updateDate
+  deadline: recruitEndDate            # 9999-12-31 = 상시 (정제 단계에서 null 처리)
+
+apply_url:
+  template: https://career.woowahan.com/recruitment/{recruit_number}/detail
+
+extra:
+  corporation: recruitCorporationNumber
+  status_code: recruitStatusCode.text
+
+# 상세: /w1/recruits/{recruitNumber} → data.recruitContents (HTML 본문)
+detail:
+  enabled: true
+  source_type: json
+  url_template: https://career.woowahan.com/w1/recruits/{recruit_number}
+  fields:
+    description: data.recruitContents

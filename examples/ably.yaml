@@ -1,0 +1,28 @@
+# 자동 생성됨 (분석 에이전트). 회사=ably
+# 분류: 자체 JSON 엔드포인트
+# LLM 매핑 근거: recruits 배열에 공고 목록이 있고, id가 고유 ID, title이 공고 제목, createdAt이 등록 일시, jobLocations[].name이 근무지, applyUrl이 완전한 지원 URL(http로 시작)이므로 직접 매핑. status 필드는 'in_progress' 값으로 마감 여부 판단 가능.
+company: ably
+source_type: json
+crawler: declarative
+list:
+  url: https://ably.team/_next/data/U4QoAbegC68Sv5TE9W1BA/recruit.json
+  method: GET
+  response_path: pageProps.recruits
+pagination:
+  type: none
+required:
+- job_id
+- title
+fields:
+  job_id: id
+  title: title
+  updated_at: createdAt
+  deadline: deadline
+  location: jobLocations[].name
+  apply_url: applyUrl
+  is_closed: status
+detail:
+  enabled: true
+  source_type: html
+  url_from: apply_url
+  body_selector: '[class*=''PageLayout__PageContent'']'

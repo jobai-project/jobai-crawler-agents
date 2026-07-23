@@ -1,0 +1,49 @@
+# 수동 작성. 회사=lineplus
+# 분류: Gatsby page-data.json (Strapi CMS)
+# API: https://careers.linecorp.com/page-data/ko/jobs/page-data.json
+company: lineplus
+company_name_ko: LINE Plus
+entry_url: https://careers.linecorp.com/ko/jobs/
+crawler: declarative
+source_type: json
+
+list:
+  url: https://careers.linecorp.com/page-data/ko/jobs/page-data.json
+  method: GET
+  params: {}
+  response_path: result.data.allStrapiJobs.edges
+  record_path: node
+
+pagination:
+  type: none
+
+required:
+- job_id
+- title
+
+fields:
+  job_id: strapiId
+  title: title
+  posted_at: start_date
+  # end_date는 대부분 형식적 값(2021/2999 등). until_filled=True가 355/368건.
+  # deadline 매핑하지 않음 — 오해 유발.
+  location: cities[].name
+  job_category: job_fields[].name
+
+extra:
+  title_en: title_en
+  company: companies[].name
+  region: regions[].name
+  employment_type: employment_type[].name
+  until_filled: until_filled
+  end_date: end_date
+
+apply_url:
+  template: "https://careers.linecorp.com/ko/jobs/{job_id}"
+
+detail:
+  enabled: true
+  source_type: json
+  url_template: "https://careers.linecorp.com/page-data/ko/jobs/{job_id}/page-data.json"
+  fields:
+    description: result.data.strapiJobs.content

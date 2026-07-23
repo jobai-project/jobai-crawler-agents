@@ -1,0 +1,47 @@
+# 카카오뱅크 — 자체 구축 SPA. 목록 API 가 POST + JSON body(검색조건).
+# Mode B: 사람이 cURL 로 POST 방식/파라미터 확인 후 작성. (GET 추측은 500)
+company: kakaobank
+company_name_ko: 카카오뱅크
+source_type: json
+crawler: declarative
+
+list:
+  url: https://recruit.kakaobank.com/api/recruits
+  method: POST
+  headers:
+    Content-Type: application/json
+    Accept: application/json
+    Origin: https://recruit.kakaobank.com
+    Referer: https://recruit.kakaobank.com/jobs
+  body:
+    pageNumber: 1
+    pageSize: 100        # totalElements 90 < 100 → 한 번에. (늘면 page_number 페이지네이션)
+  response_path: list
+
+pagination:
+  type: none
+
+required: [job_id, title]
+
+fields:
+  job_id: recruitNoticeSn
+  title: recruitNoticeName
+  job_category: recruitClassName
+  recruit_type: recruitTypeName
+  posted_at: receiveStartDatetime
+  deadline: receiveEndDatetime
+  # 지원 링크: 응답값에 https:// 가 빠져 있어 보강 필요 → 정제 단계에서 prefix. 우선 원본 보관.
+  apply_path: recruitNoticeUrl
+
+extra:
+  resume_type: recruitNoticeResumeType
+
+# 상세: 외부 ATS(recruiter.co.kr) HTML 페이지. apply_path 로 URL 조립, 본문은 .desc_cont
+detail:
+  enabled: true
+  source_type: html
+  url_template: https://{apply_path}
+  body_selector: .desc_cont
+
+apply_url:
+  template: "https://recruit.kakaobank.com/jobs/{job_id}"

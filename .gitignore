@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+output/
+.claude/
+naver.html
+naver_view.html

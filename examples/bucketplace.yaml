@@ -1,0 +1,25 @@
+# 자동 생성됨 (분석 에이전트). 회사=bucketplace
+# 분류: 자체 JSON 엔드포인트
+# LLM 매핑 근거: slug는 공고별 고유 경로로 job_id 역할. name이 공고 제목. region이 근무지. recruitUrl이 완전한 외부 URL이므로 apply_url에 직접 매핑하고 템플릿은 불필요. 목록 응답에 description 필드 없음.
+company: bucketplace
+source_type: json
+crawler: declarative
+list:
+  url: https://www.bucketplace.com/page-data/careers/page-data.json
+  response_path: result.data.position.nodes
+  method: GET
+pagination:
+  type: none
+required:
+- job_id
+- title
+fields:
+  job_id: frontmatter.slug
+  title: frontmatter.name
+  location: frontmatter.region
+  apply_url: frontmatter.recruitUrl
+detail:
+  enabled: true
+  source_type: html
+  url_from: apply_url
+  body_selector: body

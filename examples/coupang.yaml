@@ -1,0 +1,24 @@
+# 자동 생성됨 (분석 에이전트). 회사=coupang
+# 분류: greenhouse 공개 API 확인 (board=coupang)
+# ATS: greenhouse (board=coupang)
+company: coupang
+source_type: json
+crawler: declarative
+list:
+  url: https://boards-api.greenhouse.io/v1/boards/coupang/jobs
+  params:
+    content: 'true'
+  response_path: jobs
+pagination:
+  type: none
+required:
+- job_id
+- title
+- updated_at
+fields:
+  job_id: id
+  title: title
+  updated_at: updated_at
+  location: location.name
+  apply_url: absolute_url
+  description: content

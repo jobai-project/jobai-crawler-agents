@@ -1,0 +1,49 @@
+# === 회사 식별 ===
+company: toss
+company_name_ko: 토스
+entry_url: https://toss.im/career/jobs
+
+# === 라우팅 (공개 Greenhouse 기반 API → JSON, playwright 불필요) ===
+crawler: declarative
+source_type: json
+
+# === 목록 수집 (Greenhouse 변형: success 배열 + primary_job 알맹이) ===
+list:
+  url: https://api-public.toss.im/api/v3/ipd-eggnog/career/job-groups
+  method: GET
+  params: {}
+  response_path: success          # { "success": [ {...}, ... ] } (비직관 명명)
+  record_path: primary_job        # 각 항목의 알맹이는 primary_job 안
+
+pagination:
+  type: none                      # 한 번에 전체 반환
+
+# B 전략(다 모으고 매칭이 거름) → 직무 필터 없음. 위치만 참고로 둠.
+required: [job_id, title, updated_at]
+
+# === 필드 매핑 (Greenhouse 표준 필드) ===
+fields:
+  job_id: id
+  title: title
+  updated_at: updated_at
+  posted_at: first_published
+  location: location.name
+  apply_url: absolute_url
+  deadline: application_deadline   # 표준 필드(대개 null) → 아래 metadata 가 덮어씀
+
+# === metadata 배열에서 name 매칭 → value 추출 (토스 한국 커스텀 필드) ===
+metadata_extraction:
+  source_field: metadata           # primary_job.metadata = [{name, value}, ...]
+  match_by: name
+  value_from: value
+  mappings:
+    description: "Job Description을 작성해 주세요.(작성 전, 채용 커뮤니케이션 가이드 노션을 꼭 참고해 주세요.)"
+    deadline: "커리어페이지 채용공고 클로징 일자 (서류접수 마감일이 정해진 경우)"
+    employment_type: "Employment_Type"
+    job_category: "커리어 페이지 노출 Job Category 값을 선택해주세요"
+    subsidiary: "포지션의 소속 자회사를 선택해 주세요."
+
+# === 식별/원본 → JSONB ===
+extra:
+  requisition_id: requisition_id
+  company_name: company_name

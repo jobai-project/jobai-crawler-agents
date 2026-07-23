@@ -1,0 +1,28 @@
+# 자동 생성됨 (분석 에이전트). 회사=kakao
+# 분류: 자체 JSON 엔드포인트
+# LLM 매핑 근거: realId는 공고의 고유 식별자(P-14039 형식). jobOfferTitle이 공고 제목. uptDate가 최종 수정 일시. locationName이 근무지(판교). introduction, workContentDesc, qualification이 공고 본문의 주요 내용. closeFlag가 마감 여부를 boolean으로 나타냄. apply_url과 deadline은 응답에 없음.
+company: kakao
+source_type: json
+crawler: declarative
+list:
+  url: https://careers.kakao.com/public/api/job-list
+  method: GET
+  params: {}
+  response_path: jobList
+pagination:
+  type: none
+required:
+- job_id
+- title
+fields:
+  job_id: realId
+  title: jobOfferTitle
+  updated_at: uptDate
+  location: locationName
+  description:
+  - introduction
+  - workContentDesc
+  - qualification
+  is_closed: closeFlag
+apply_url:
+  template: "https://careers.kakao.com/jobs/{job_id}"

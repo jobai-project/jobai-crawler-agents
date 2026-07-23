@@ -1,0 +1,44 @@
+# 자동 생성됨 (분석 에이전트). 회사=nhn
+# 분류: 자체 JSON 엔드포인트
+# API: https://careers.nhn.com/v1/job-postings (page_number 페이지네이션, page 0-based)
+# 참고: location 필드는 NHN API에 존재하지 않음
+company: nhn
+source_type: json
+crawler: declarative
+list:
+  url: https://careers.nhn.com/v1/job-postings
+  method: GET
+  params:
+    intensive-recruiting: ""
+    size: 30
+  response_path: result
+pagination:
+  type: page_number
+  param: page
+  start: 0
+  # total_pages_path 없음 — 빈 배치에서 자동 정지
+null_values:
+  deadline: "2999"
+required:
+- job_id
+- title
+fields:
+  job_id: id
+  title: name
+  posted_at: postingStaDatetime
+  deadline: postingEndDatetime
+  job_category: jobSeries[].name
+  employee_type: employeeType.name
+extra:
+  corporation: corporation.name
+  career: careerType.name
+  hashtag: hashtag
+  finish_yn: finishYn
+apply_url:
+  template: "https://careers.nhn.com/recruits/{job_id}"
+detail:
+  enabled: true
+  source_type: json
+  url_template: "https://careers.nhn.com/v1/job-postings/{job_id}"
+  fields:
+    description: result.jobPostingContentsItems

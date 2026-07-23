@@ -1,0 +1,45 @@
+# 자동 생성됨 (분석 에이전트). 회사=upstage
+# 분류: greeting 공개 API 확인 (board=upstage)
+# ATS: greeting (board=upstage)
+company: upstage
+source_type: embedded_json
+crawler: declarative
+list:
+  url: https://careers.upstage.ai/ko/upstage
+  script_id: __NEXT_DATA__
+  select:
+    array: props.pageProps.dehydratedState.queries
+    match_field: queryKey
+    match_value:
+    - openings
+    take: state.data
+pagination:
+  type: none
+required:
+- job_id
+- title
+fields:
+  job_id: openingId
+  title: title
+  posted_at: openDate
+  deadline: dueDate
+  job_category: openingJobPosition.openingJobPositions[].workspaceOccupation.occupation
+  location: openingJobPosition.openingJobPositions[].workspacePlace.location
+apply_url:
+  template: https://upstage.career.greetinghr.com/ko/o/{job_id}
+extra:
+  d_day: deadlineDDay
+detail:
+  enabled: true
+  source_type: embedded_json
+  url_template: https://upstage.career.greetinghr.com/ko/o/{job_id}
+  script_id: __NEXT_DATA__
+  select:
+    array: props.pageProps.dehydratedState.queries
+    match_field: queryKey
+    match_prefix:
+    - career
+    - getOpeningById
+    take: state.data.data
+  fields:
+    description: openingsInfo.detail
