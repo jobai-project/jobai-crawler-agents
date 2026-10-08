@@ -8,12 +8,14 @@
 
 ## 아키텍처
 
-2층 구조로 분리되어 있다.
+| 구성 | 디렉토리 | LLM | 용도 |
+|------|----------|-----|------|
+| **에이전트** | `agent/` | Claude Haiku 4.5 | URL → YAML 명세 자동 생성 |
+| **검증 엔진** | `collector/` | 없음 | YAML 명세가 정상 동작하는지 사전 검증 |
 
-| 층 | 디렉토리 | LLM | 용도 | 비용 |
-|----|----------|-----|------|------|
-| **엔진** | `collector/` | 없음 | 선언적 수집 (본번) | 0원 |
-| **에이전트** | `agent/` | Claude Haiku 4.5 | URL → YAML 자동 생성 (초기 설정) | 1~3원/회 |
+> **실제 수집은 Spring 서비스에서 수행한다.**
+> `collector/`는 스프링 엔진에 YAML을 넘기기 전, 명세가 올바른지 미리 확인하기 위한 Python 프로토타입이다.
+> 에이전트의 `verify` 노드도 이 검증 엔진을 내부적으로 호출해 명세를 점검한다.
 
 ---
 
@@ -30,10 +32,10 @@ crawler-agents/
 │   ├── cost.py          # LLM 비용 계산
 │   ├── browser_probe.py # Playwright 브라우저 탐침 (SPA 최후 수단)
 │   └── verify_agent.py  # CLI 진입점
-├── collector/           # 선언적 수집 엔진 (LLM 0개)
+├── collector/           # 검증용 수집 엔진 (LLM 0개, 스프링 투입 전 사전 검증)
 │   ├── engine.py        # JSON / HTML / embedded_json 수집·매핑
 │   ├── run.py           # CLI 진입점
-│   └── verify_run.py    # 엔진 단독 검증
+│   └── verify_run.py    # 명세 단독 검증
 ├── examples/            # 회사별 수집 명세 YAML (자동 생성)
 │   ├── kakao.yaml
 │   ├── naver.yaml
@@ -154,7 +156,7 @@ cp .env.example .env
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-> 엔진(`collector/`)만 쓸 때는 API 키 불필요.
+> 검증 엔진(`collector/`)만 쓸 때는 API 키 불필요.
 
 ---
 
@@ -184,10 +186,12 @@ python -m agent.verify_agent bucketplace https://www.bucketplace.com/careers/
   수집 : 53건 | 점검: 통과
 ```
 
-### 엔진: YAML로 직접 수집
+### 검증 엔진: YAML 명세 사전 검증
+
+스프링에 넘기기 전에 명세가 정상 동작하는지 확인한다.
 
 ```bash
-# YAML 명세로 수집
+# YAML 명세로 수집 테스트
 python -m collector.run examples/kakao.yaml
 
 # JSON 파일로 출력 저장
@@ -196,7 +200,7 @@ python -m collector.run examples/kakao.yaml --out output/kakao.json
 # 오프라인 자체 테스트 (네트워크 불필요)
 python -m collector.run --selftest
 
-# 수집 결과 검증
+# 수집 결과 검증 (필수 필드·중복·상세 페이지 점검)
 python -m collector.verify_run examples/kakao.yaml
 ```
 
@@ -320,4 +324,3 @@ detail:
 # 엔진 오프라인 자체 테스트
 python -m collector.run --selftest
 ```
-
