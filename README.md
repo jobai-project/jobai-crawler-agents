@@ -52,12 +52,7 @@ crawler-agents/
 
 에이전트는 LangGraph StateGraph로 구성되며 아래 순서로 실행된다.
 
-```
-probe → classify ─┬→ ats_template ─┐
-                  ├→ map_spec      ├→ discover_detail → verify ─┬→ finalize → END
-                  └→ to_human ────┘                             ├→ map_spec  (재시도, 최대 3회)
-                                                                └→ to_human → END
-```
+<img width="791" height="271" alt="그림1" src="https://github.com/user-attachments/assets/806cb3b6-adb1-4907-a917-63959fa059d3" />
 
 ### 조건 분기
 
