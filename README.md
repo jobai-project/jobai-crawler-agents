@@ -52,7 +52,7 @@ crawler-agents/
 
 에이전트는 LangGraph StateGraph로 구성되며 아래 순서로 실행된다.
 
-<img width="791" height="271" alt="그림1" src="https://github.com/user-attachments/assets/806cb3b6-adb1-4907-a917-63959fa059d3" />
+<img width="877" height="296" alt="image" src="https://github.com/user-attachments/assets/90c9030e-388a-4deb-99c1-005d649ecd49" />
 
 ### 조건 분기
 
